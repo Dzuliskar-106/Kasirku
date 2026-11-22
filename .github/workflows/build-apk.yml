@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build TokoKu POS APK
 
 on:
   push:
@@ -24,12 +24,61 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Dependencies & Init Capacitor
+      - name: Setup Python & Pillow untuk Generate Icon Keranjang
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pillow
+
+      - name: Generate Custom Cart Icon & Splash Screen
         run: |
-          npm install
-          npx cap init "KasirKu UMKM" "com.kasirku.umkm" --web-dir=www
+          mkdir -p assets
+          python3 - << 'EOF'
+          from PIL import Image, ImageDraw
+
+          def draw_cart_logo(size, bg_color=(185, 28, 28)):
+              img = Image.new("RGBA", (size, size), bg_color + (255,))
+              draw = ImageDraw.Draw(img)
+              s = size / 100.0
+
+              # Lingkaran aksen hijau di sudut kanan atas
+              draw.ellipse([60*s, 14*s, 86*s, 40*s], fill=(21, 128, 61, 255))
+              # Tanda centang putih di dalam lingkaran hijau
+              draw.line([(67*s, 27*s), (72*s, 32*s), (80*s, 22*s)], fill=(255, 255, 255, 255), width=max(2, int(3.2*s)))
+
+              # Badan keranjang belanja putih
+              draw.line([(16*s, 28*s), (27*s, 28*s), (35*s, 64*s), (76*s, 64*s), (83*s, 38*s), (30*s, 38*s)],
+                        fill=(255, 255, 255, 255), width=max(3, int(5.5*s)), joint="curve")
+
+              # Roda keranjang berwarna hijau terang
+              draw.ellipse([36*s, 71*s, 48*s, 83*s], fill=(74, 222, 128, 255))
+              draw.ellipse([64*s, 71*s, 76*s, 83*s], fill=(74, 222, 128, 255))
+              return img
+
+          # Simpan icon-only & splash
+          icon = draw_cart_logo(1024)
+          icon.save("assets/icon-only.png")
+          icon.save("assets/icon-foreground.png")
+
+          splash = Image.new("RGBA", (2732, 2732), (246, 245, 242, 255))
+          logo_small = draw_cart_logo(520)
+          splash.paste(logo_small, ((2732 - 520)//2, (2732 - 520)//2), logo_small)
+          splash.save("assets/splash.png")
+          EOF
+
+      - name: Init Capacitor & Generate Android Assets
+        run: |
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets
+          npx cap init "TokoKu POS" "com.tokoku.posumkm" --web-dir=www
           npx cap add android
+          npx capacitor-assets generate --android
           npx cap sync android
+
+      - name: Tambah Izin Kamera di AndroidManifest (Untuk Scan Barcode)
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          sed -i 's/<uses-permission android:name="android.permission.INTERNET" \/>/<uses-permission android:name="android.permission.INTERNET" \/>\n    <uses-permission android:name="android.permission.CAMERA" \/>/' $MANIFEST
 
       - name: Build Debug APK
         run: |
@@ -40,5 +89,5 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: KasirKu-UMKM-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: TokoKu-POS-UMKM-APK
+          path: android/app/build/outputs/apk/debug/TokoKu-POS.apk
