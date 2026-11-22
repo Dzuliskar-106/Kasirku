@@ -36,8 +36,9 @@ jobs:
           python3 - << 'EOF'
           from PIL import Image, ImageDraw
 
-          def draw_cart_logo(size, bg_color=(185, 28, 28)):
-              img = Image.new("RGBA", (size, size), bg_color + (255,))
+          def draw_cart_logo(size, transparent_bg=False):
+              bg = (0, 0, 0, 0) if transparent_bg else (185, 28, 28, 255)
+              img = Image.new("RGBA", (size, size), bg)
               draw = ImageDraw.Draw(img)
               s = size / 100.0
 
@@ -55,15 +56,17 @@ jobs:
               draw.ellipse([64*s, 71*s, 76*s, 83*s], fill=(74, 222, 128, 255))
               return img
 
-          # Simpan icon-only & splash
-          icon = draw_cart_logo(1024)
-          icon.save("assets/icon-only.png")
-          icon.save("assets/icon-foreground.png")
+          # 1. Icon penuh & foreground + background (wajib untuk Android Adaptive Icon)
+          draw_cart_logo(1024, transparent_bg=False).save("assets/icon-only.png")
+          draw_cart_logo(1024, transparent_bg=True).save("assets/icon-foreground.png")
+          Image.new("RGBA", (1024, 1024), (185, 28, 28, 255)).save("assets/icon-background.png")
 
+          # 2. Splash screen terang & gelap
           splash = Image.new("RGBA", (2732, 2732), (246, 245, 242, 255))
-          logo_small = draw_cart_logo(520)
+          logo_small = draw_cart_logo(520, transparent_bg=False)
           splash.paste(logo_small, ((2732 - 520)//2, (2732 - 520)//2), logo_small)
           splash.save("assets/splash.png")
+          splash.save("assets/splash-dark.png")
           EOF
 
       - name: Init Capacitor & Generate Android Assets
@@ -72,7 +75,7 @@ jobs:
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets
           npx cap init "TokoKu POS" "com.tokoku.posumkm" --web-dir=www
           npx cap add android
-          npx capacitor-assets generate --android
+          npx capacitor-assets generate --android --iconBackgroundColor '#b91c1c' --splashBackgroundColor '#f6f5f2'
           npx cap sync android
 
       - name: Tambah Izin Kamera di AndroidManifest (Untuk Scan Barcode)
@@ -90,4 +93,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: TokoKu-POS-UMKM-APK
-          path: android/app/build/outputs/apk/debug/TokoKu-POS.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
