@@ -27,7 +27,20 @@ jobs:
       - name: Siapkan Folder Web & Capacitor
         run: |
           mkdir -p www assets
-          cp index.html www/index.html
+          if [ -f "index.html" ]; then
+            cp index.html www/index.html
+          elif [ -f "www/index.html" ]; then
+            echo "File sudah ada di www/index.html"
+          else
+            FOUND_HTML=$(find . -maxdepth 3 -name "*.html" ! -path "./node_modules/*" | head -n 1)
+            if [ -n "$FOUND_HTML" ]; then
+              cp "$FOUND_HTML" www/index.html
+            else
+              echo "Error: Tidak ada file .html ditemukan di repository!"
+              exit 1
+            fi
+          fi
+          rm -rf android
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
 
@@ -74,4 +87,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Aplikasi-Kasir-UMKM
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk,
