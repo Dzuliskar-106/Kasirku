@@ -1,4 +1,4 @@
-name: Build TokoKu POS APK
+name: Build Android APK
 
 on:
   push:
@@ -18,70 +18,51 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Setup Java 17
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Python & Pillow untuk Generate Icon Keranjang
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install pillow
-
-      - name: Generate Custom Cart Icon & Splash Screen
+      - name: Siapkan Folder Web & Capacitor
         run: |
-          mkdir -p assets
-          python3 - << 'EOF'
-          from PIL import Image, ImageDraw
-
-          def draw_cart_logo(size, transparent_bg=False):
-              bg = (0, 0, 0, 0) if transparent_bg else (185, 28, 28, 255)
-              img = Image.new("RGBA", (size, size), bg)
-              draw = ImageDraw.Draw(img)
-              s = size / 100.0
-
-              # Lingkaran aksen hijau di sudut kanan atas
-              draw.ellipse([60*s, 14*s, 86*s, 40*s], fill=(21, 128, 61, 255))
-              # Tanda centang putih di dalam lingkaran hijau
-              draw.line([(67*s, 27*s), (72*s, 32*s), (80*s, 22*s)], fill=(255, 255, 255, 255), width=max(2, int(3.2*s)))
-
-              # Badan keranjang belanja putih
-              draw.line([(16*s, 28*s), (27*s, 28*s), (35*s, 64*s), (76*s, 64*s), (83*s, 38*s), (30*s, 38*s)],
-                        fill=(255, 255, 255, 255), width=max(3, int(5.5*s)), joint="curve")
-
-              # Roda keranjang berwarna hijau terang
-              draw.ellipse([36*s, 71*s, 48*s, 83*s], fill=(74, 222, 128, 255))
-              draw.ellipse([64*s, 71*s, 76*s, 83*s], fill=(74, 222, 128, 255))
-              return img
-
-          # 1. Icon penuh & foreground + background (wajib untuk Android Adaptive Icon)
-          draw_cart_logo(1024, transparent_bg=False).save("assets/icon-only.png")
-          draw_cart_logo(1024, transparent_bg=True).save("assets/icon-foreground.png")
-          Image.new("RGBA", (1024, 1024), (185, 28, 28, 255)).save("assets/icon-background.png")
-
-          # 2. Splash screen terang & gelap
-          splash = Image.new("RGBA", (2732, 2732), (246, 245, 242, 255))
-          logo_small = draw_cart_logo(520, transparent_bg=False)
-          splash.paste(logo_small, ((2732 - 520)//2, (2732 - 520)//2), logo_small)
-          splash.save("assets/splash.png")
-          splash.save("assets/splash-dark.png")
-          EOF
-
-      - name: Init Capacitor & Generate Android Assets
-        run: |
+          mkdir -p www assets
+          cp index.html www/index.html
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets
-          npx cap init "TokoKu POS" "com.tokoku.posumkm" --web-dir=www
-          npx cap add android
-          npx capacitor-assets generate --android --iconBackgroundColor '#b91c1c' --splashBackgroundColor '#f6f5f2'
-          npx cap sync android
+          npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
 
-      - name: Tambah Izin Kamera di AndroidManifest (Untuk Scan Barcode)
+      - name: Generate Otomatis Ikon Etalase Toko (Tanpa Upload Manual)
         run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          sed -i 's/<uses-permission android:name="android.permission.INTERNET" \/>/<uses-permission android:name="android.permission.INTERNET" \/>\n    <uses-permission android:name="android.permission.CAMERA" \/>/' $MANIFEST
+          node -e '
+          const fs = require("fs");
+          const svg = `<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ef4444"/>
+                <stop offset="100%" stop-color="#b91c1c"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+            <path d="M180 390L260 190H764L844 390H180Z" fill="#ffffff"/>
+            <path d="M350 190L320 390M512 190V390M674 190L704 390" stroke="#dc2626" stroke-width="36"/>
+            <path d="M180 390C180 436 218 472 264 472C310 472 346 436 346 390C346 436 384 472 430 472C476 472 512 436 512 390C512 436 548 472 594 472C640 472 678 436 678 390C678 436 714 472 760 472C806 472 844 436 844 390H180Z" fill="#fecaca"/>
+            <path d="M245 478V780C245 805 265 825 290 825H734C759 825 779 805 779 780V478" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="52" stroke-linecap="round"/>
+            <rect x="325" y="565" width="180" height="260" rx="34" fill="#4ade80"/>
+            <circle cx="465" cy="700" r="22" fill="#14532d"/>
+            <rect x="565" y="565" width="145" height="140" rx="28" fill="#ffffff" fill-opacity="0.92"/>
+          </svg>`;
+          fs.writeFileSync("assets/icon.svg", svg);
+          '
+          sudo apt-get update && sudo apt-get install -y librsvg2-bin
+          rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png
+          rsvg-convert -w 2732 -h 2732 assets/icon.svg -o assets/splash.png
+
+      - name: Inisialisasi Android & Pasang Ikon Launcher
+        run: |
+          npx cap init "Kasir Toko" "com.toko.kasir" --web-dir=www
+          npx cap add android
+          npx capacitor-assets generate --android
+          npx cap sync android
 
       - name: Build Debug APK
         run: |
@@ -89,8 +70,8 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload File APK
         uses: actions/upload-artifact@v4
         with:
-          name: TokoKu-POS-UMKM-APK
+          name: Aplikasi-Kasir-UMKM
           path: android/app/build/outputs/apk/debug/app-debug.apk
