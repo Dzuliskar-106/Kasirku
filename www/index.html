@@ -3,56 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#b91c1c" />
-  <title>TokoKu POS — Kasir & Pembukuan UMKM</title>
+  <title>Kasir & Pembukuan UMKM</title>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     :root {
-      --red: #dc2626;
-      --red-deep: #991b1b;
-      --red-soft: #fef2f2;
-      --green: #16a34a;
-      --green-soft: #f0fdf4;
-      --blue: #2563eb;
-      --blue-soft: #eff6ff;
-      --amber: #d97706;
-      --amber-soft: #fffbeb;
       --bg: #f3f4f6;
       --card: #ffffff;
       --ink: #111827;
       --muted: #6b7280;
       --line: #e5e7eb;
-      --shadow-sm: 0 2px 8px rgba(17, 24, 39, 0.04);
-      --shadow-md: 0 8px 20px rgba(17, 24, 39, 0.07);
+      --red: #dc2626;
+      --red-deep: #991b1b;
+      --red-soft: #fef2f2;
+      --green: #16a34a;
+      --green-soft: #f0fdf4;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --shadow-sm: 0 2px 6px rgba(17, 24, 39, 0.05);
+      --shadow-md: 0 8px 20px rgba(17, 24, 39, 0.08);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
       background: var(--bg);
       color: var(--ink);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
       padding-bottom: 84px;
+      min-height: 100dvh;
     }
 
-    /* Top App Bar dengan Efek Glass */
+    /* ==================== LAYAR LOGIN / BUKA KASIR ==================== */
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(155deg, #111827 0%, #1f2937 55%, #7f1d1d 100%);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-screen.hidden { display: none; }
+
+    .login-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 370px;
+      border-radius: 26px;
+      padding: 28px 22px 24px;
+      text-align: center;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+    }
+
+    .login-logo-wrap {
+      width: 84px;
+      height: 84px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 12px 24px rgba(220, 38, 38, 0.3);
+      overflow: hidden;
+    }
+    .login-logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .login-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .login-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .pin-input {
+      width: 100%;
+      text-align: center;
+      letter-spacing: 6px;
+      font-size: 20px;
+      font-weight: 800;
+      padding: 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .pin-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    }
+
+    /* Header */
     .topbar {
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(229, 231, 235, 0.85);
-      padding: 12px 16px;
       position: sticky;
       top: 0;
-      z-index: 40;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -62,36 +127,34 @@
     .shop-identity {
       display: flex;
       align-items: center;
-      gap: 11px;
+      gap: 10px;
       min-width: 0;
     }
 
     .logo-box {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: linear-gradient(145deg, #ef4444 0%, #b91c1c 60%, #7f1d1d 100%);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
       display: grid;
       place-items: center;
       flex-shrink: 0;
       overflow: hidden;
-      box-shadow: 0 6px 14px rgba(220, 38, 38, 0.28), inset 0 1px 1px rgba(255,255,255,0.35);
+      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
     }
-
     .logo-box img { width: 100%; height: 100%; object-fit: cover; }
 
     .shop-meta { min-width: 0; }
     .shop-meta h1 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--ink);
+      letter-spacing: -0.01em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .shop-meta span {
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--muted);
       display: block;
       white-space: nowrap;
@@ -99,48 +162,44 @@
       text-overflow: ellipsis;
     }
 
+    .top-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
     .pill-btn {
       border: 1px solid var(--line);
-      background: #fff;
+      background: var(--card);
       color: var(--ink);
-      padding: 7px 12px;
+      padding: 6px 11px;
       border-radius: 10px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      box-shadow: var(--shadow-sm);
-      transition: transform 0.1s ease;
+      gap: 5px;
     }
-    .pill-btn:active { transform: scale(0.96); }
-
     .pill-btn.green {
-      background: var(--green-soft);
       border-color: #bbf7d0;
+      background: var(--green-soft);
       color: var(--green);
     }
 
+    /* Container & Pages */
     .container {
-      max-width: 1140px;
-      width: 100%;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 14px;
     }
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.16s ease; }
 
-    .page { display: none; animation: fadePage 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-    .page.active { display: block; }
-
-    @keyframes fadePage {
-      from { opacity: 0; transform: translateY(6px); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Due Date Banner */
+    /* Due Alert Banner */
     .due-banner {
-      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      background: var(--amber-soft);
       border: 1px solid #fde68a;
       border-left: 4px solid var(--amber);
       border-radius: 14px;
@@ -151,22 +210,22 @@
       justify-content: space-between;
       gap: 10px;
       cursor: pointer;
-      box-shadow: var(--shadow-sm);
     }
     .due-banner.show { display: flex; }
     .due-banner.urgent {
-      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      background: var(--red-soft);
       border-color: #fecaca;
       border-left-color: var(--red);
     }
 
-    /* Dashboard KPI Cards */
+    /* KPI Grid */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 11px;
-      margin-bottom: 15px;
+      margin-bottom: 14px;
     }
+    @media (min-width: 768px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
 
     .kpi-card {
       background: var(--card);
@@ -174,40 +233,47 @@
       border-radius: 16px;
       padding: 14px;
       box-shadow: var(--shadow-sm);
-      position: relative;
-      overflow: hidden;
     }
-
     .kpi-card.highlight {
       background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-      color: #fff;
+      color: #ffffff;
       border: none;
-      box-shadow: 0 10px 22px rgba(17, 24, 39, 0.18);
+      box-shadow: var(--shadow-md);
     }
-    .kpi-card.highlight .kpi-lbl { color: #9ca3af; }
-    .kpi-card.highlight .kpi-sub { color: #d1d5db; }
-
     .kpi-top {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
     }
-
+    .kpi-lbl {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .kpi-card.highlight .kpi-lbl { color: #d1d5db; }
     .kpi-icon {
       width: 28px;
       height: 28px;
-      border-radius: 8px;
+      border-radius: 9px;
       display: grid;
       place-items: center;
-      font-size: 13px;
+      font-size: 14px;
     }
+    .kpi-val {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .kpi-card.highlight .kpi-sub { color: #9ca3af; }
 
-    .kpi-lbl { font-size: 11.5px; font-weight: 700; color: var(--muted); }
-    .kpi-val { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-    .kpi-sub { font-size: 11px; margin-top: 4px; color: var(--muted); font-weight: 600; }
-
-    /* Search & Scan */
+    /* Search & Scanner */
     .scan-search-row { display: flex; gap: 8px; margin-bottom: 12px; }
 
     .input-box {
@@ -263,7 +329,6 @@
       color: var(--muted);
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.15s;
     }
     .chip.active {
       background: linear-gradient(135deg, var(--red), var(--red-deep));
@@ -292,16 +357,9 @@
       position: relative;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
-      transition: transform 0.1s ease, border-color 0.15s, box-shadow 0.15s;
     }
-    .item-card:active {
-      transform: scale(0.97);
-      border-color: var(--red);
-    }
-    .item-card.selected {
-      border: 1.5px solid var(--green);
-      background: #fcfffd;
-    }
+    .item-card:active { transform: scale(0.97); border-color: var(--red); }
+    .item-card.selected { border: 1.5px solid var(--green); background: #fcfffd; }
 
     .item-qty-tag {
       position: absolute;
@@ -313,7 +371,6 @@
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 8px;
-      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.3);
     }
 
     .item-cat-pill {
@@ -328,13 +385,7 @@
       width: fit-content;
     }
 
-    .item-title {
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.35;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
+    .item-title { font-size: 14px; font-weight: 700; line-height: 1.35; color: var(--ink); margin-bottom: 6px; }
     .item-footer {
       display: flex;
       justify-content: space-between;
@@ -365,14 +416,8 @@
       box-shadow: 0 12px 26px rgba(21, 128, 61, 0.35);
       z-index: 35;
       cursor: pointer;
-      animation: slideUp 0.2s ease;
     }
     .checkout-dock.show { display: flex; }
-
-    @keyframes slideUp {
-      from { transform: translateY(15px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
 
     /* Cards & Forms */
     .panel {
@@ -396,13 +441,7 @@
     .panel-head h2 { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
 
     .field { margin-bottom: 12px; }
-    .field label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 5px;
-    }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -418,7 +457,6 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
-      transition: transform 0.1s ease, opacity 0.15s;
     }
     .btn:active { transform: scale(0.98); }
     .btn-red { background: linear-gradient(135deg, var(--red), var(--red-deep)); color: #fff; box-shadow: 0 6px 14px rgba(220, 38, 38, 0.22); }
@@ -448,7 +486,6 @@
       color: var(--muted);
       border-radius: 9px;
       cursor: pointer;
-      transition: all 0.16s ease;
     }
     .seg-btn.active {
       background: var(--card);
@@ -457,13 +494,7 @@
     }
 
     /* Badges */
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 7px;
-      font-size: 10.5px;
-      font-weight: 800;
-    }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 7px; font-size: 10.5px; font-weight: 800; }
     .badge-ok { background: var(--green-soft); color: var(--green); }
     .badge-warn { background: var(--amber-soft); color: var(--amber); }
     .badge-late { background: var(--red-soft); color: var(--red); }
@@ -484,7 +515,7 @@
     .text-green { color: var(--green); }
     .text-red { color: var(--red); }
 
-    /* Bottom Navigation dengan Sorotan Kapsul Abu-abu Aktif */
+    /* Bottom Navigation */
     .bottom-bar {
       position: fixed;
       bottom: 0;
@@ -500,7 +531,6 @@
       padding: 6px 5px;
       gap: 3px;
       z-index: 40;
-      box-shadow: 0 -4px 16px rgba(0,0,0,0.03);
     }
 
     .tab-btn {
@@ -517,20 +547,14 @@
       font-weight: 700;
       cursor: pointer;
       position: relative;
-      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
     }
-    .tab-btn:active { transform: scale(0.94); }
-
     .tab-btn.active {
       background: linear-gradient(180deg, #e5e7eb 0%, #d1d5db 100%);
       color: var(--ink);
       box-shadow: inset 0 1px 1px rgba(255,255,255,0.7);
     }
-    .tab-btn.active svg {
-      stroke: var(--red);
-      stroke-width: 2.3;
-    }
-    .tab-btn svg { width: 19px; height: 19px; transition: stroke 0.2s; }
+    .tab-btn.active svg { stroke: var(--red); stroke-width: 2.3; }
+    .tab-btn svg { width: 19px; height: 19px; }
 
     .nav-badge {
       position: absolute;
@@ -546,7 +570,6 @@
       display: none;
       place-items: center;
       padding: 0 4px;
-      box-shadow: 0 2px 5px rgba(220,38,38,0.4);
     }
     .nav-badge.show { display: grid; }
 
@@ -572,7 +595,6 @@
       padding: 20px;
       max-height: 92dvh;
       overflow-y: auto;
-      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
     }
     @media (min-width: 640px) { .sheet { border-radius: 18px; } }
 
@@ -608,9 +630,9 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      z-index: 100;
+      z-index: 250;
     }
-    .pop-backdrop.open { display: flex; animation: popFade 0.18s ease; }
+    .pop-backdrop.open { display: flex; }
 
     .pop-box {
       background: var(--card);
@@ -620,7 +642,6 @@
       padding: 24px 20px 20px;
       text-align: center;
       box-shadow: 0 24px 40px rgba(0,0,0,0.22);
-      animation: popScale 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .pop-icon {
@@ -640,9 +661,6 @@
     .pop-title { font-size: 16.5px; font-weight: 800; margin-bottom: 6px; }
     .pop-msg { font-size: 13px; color: var(--muted); line-height: 1.45; margin-bottom: 18px; }
 
-    @keyframes popFade { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popScale { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
@@ -651,6 +669,27 @@
   </style>
 </head>
 <body>
+
+  <!-- ==================== LAYAR LOGIN / BUKA KASIR ==================== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-logo-wrap" id="loginLogoBox"></div>
+      <div class="login-title" id="loginShopName">Toko Sejahtera Mandiri</div>
+      <div class="login-sub" id="loginShopSub">Sistem Kasir & Pembukuan UMKM</div>
+
+      <div id="loginPinArea" style="display:none;">
+        <input type="password" id="loginPinInput" class="pin-input" inputmode="numeric" maxlength="6" placeholder="Masukkan PIN Kasir..." onkeyup="if(event.key==='Enter') unlockApp()" />
+      </div>
+
+      <button class="btn btn-red" onclick="unlockApp()" style="padding:14px; font-size:14.5px;">
+        Buka Aplikasi Kasir →
+      </button>
+
+      <div style="margin-top:14px; font-size:11px; color:var(--muted);" id="loginHintText">
+        Siap melayani transaksi & laporan keuangan
+      </div>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="topbar">
@@ -661,9 +700,12 @@
         <span id="hdrShopSub">Kasir & Pembukuan UMKM</span>
       </div>
     </div>
-    <button class="pill-btn green" onclick="connectBT()">
-      <span style="font-size:9px;">●</span> <span id="btText">Printer</span>
-    </button>
+    <div class="top-actions">
+      <button class="pill-btn green" onclick="connectBT()">
+        <span style="font-size:9px;">●</span> <span id="btText">Printer</span>
+      </button>
+      <button class="pill-btn" onclick="lockApp()" title="Kunci Layar">🔒</button>
+    </div>
   </header>
 
   <main class="container">
@@ -677,7 +719,7 @@
       <span style="font-size:12px; font-weight:800;">Lihat →</span>
     </div>
 
-    <!-- ==================== 1. HALAMAN DASHBOARD (HALAMAN DEPAN) ==================== -->
+    <!-- ==================== 1. HALAMAN DASHBOARD ==================== -->
     <section id="page-dash" class="page active">
       <div class="seg-tabs" id="dashPeriodTabs">
         <button class="seg-btn active" onclick="setDashPeriod('daily', this)">Harian</button>
@@ -747,7 +789,7 @@
       </div>
     </section>
 
-    <!-- ==================== 2. HALAMAN KASIR (KATALOG PRODUK) ==================== -->
+    <!-- ==================== 2. HALAMAN KASIR ==================== -->
     <section id="page-pos" class="page">
       <div class="scan-search-row">
         <input type="text" id="posSearch" class="input-box" placeholder="Cari barang / ketik barcode..." oninput="renderCatalog()" onkeyup="handleBarcodeEnter(event)" />
@@ -761,7 +803,7 @@
       <div class="catalog" id="catalogGrid"></div>
     </section>
 
-    <!-- ==================== 3. HALAMAN TAGIHAN (KASBON & HUTANG + CICILAN MANUAL) ==================== -->
+    <!-- ==================== 3. HALAMAN TAGIHAN ==================== -->
     <section id="page-bills" class="page">
       <div class="seg-tabs two">
         <button class="seg-btn active" onclick="switchBillTab('cust', this)">Kasbon Pelanggan (<span id="cntCustBill">0</span>)</button>
@@ -789,7 +831,7 @@
       </div>
     </section>
 
-    <!-- ==================== 4. HALAMAN KULAKAN SUPPLIER (DROPDOWN SUPPLIER) ==================== -->
+    <!-- ==================== 4. HALAMAN KULAKAN SUPPLIER ==================== -->
     <section id="page-purchase" class="page">
       <div class="panel">
         <div class="panel-head">
@@ -841,7 +883,7 @@
       </div>
     </section>
 
-    <!-- ==================== 5. HALAMAN PRODUK & KATEGORI DROPDOWN ==================== -->
+    <!-- ==================== 5. HALAMAN PRODUK ==================== -->
     <section id="page-products" class="page">
       <div class="panel">
         <div class="panel-head">
@@ -892,7 +934,7 @@
       </div>
     </section>
 
-    <!-- ==================== 6. HALAMAN LAPORAN & GRAFIK LABA RUGI ==================== -->
+    <!-- ==================== 6. HALAMAN LAPORAN ==================== -->
     <section id="page-finance" class="page">
       <div class="seg-tabs three">
         <button class="seg-btn active" onclick="switchReport('pl', this)">Laba Rugi</button>
@@ -901,7 +943,6 @@
       </div>
 
       <div id="printArea">
-        <!-- LABA RUGI + GRAFIK -->
         <div id="rep-pl" class="panel">
           <div class="panel-head">
             <div>
@@ -937,7 +978,6 @@
           </div>
         </div>
 
-        <!-- NERACA -->
         <div id="rep-bs" class="panel" style="display:none;">
           <div class="panel-head">
             <div>
@@ -959,11 +999,10 @@
             <tr><td>Hutang Dagang ke Supplier</td><td class="num text-red" id="bsPayable">Rp 0</td></tr>
             <tr><td>Modal Awal Pemilik</td><td class="num" id="bsCapital">Rp 0</td></tr>
             <tr><td>Laba Ditahan (Akumulasi Laba Bersih)</td><td class="num" id="bsRetained">Rp 0</td></tr>
-            <tr class="total-row"><td>TOTAL PASIVA</td><td class="num" id="bsTotalPasiva">Rp 0</td></tr>
+            <tr class="total-row"><td>TOTAL PASIVA</td><td class="num text-green" id="bsTotalPasiva">Rp 0</td></tr>
           </table>
         </div>
 
-        <!-- RIWAYAT PENJUALAN -->
         <div id="rep-sales" class="panel" style="display:none;">
           <div class="panel-head">
             <h2>Riwayat Penjualan</h2>
@@ -974,23 +1013,23 @@
       </div>
     </section>
 
-    <!-- ==================== 7. HALAMAN PENGATURAN USAHA & LOGO ==================== -->
+    <!-- ==================== 7. HALAMAN PENGATURAN USAHA & KEAMANAN ==================== -->
     <section id="page-settings" class="page">
       <div class="panel">
         <div class="panel-head">
-          <h2>Identitas & Logo Usaha (Aplikasi & Struk)</h2>
+          <h2>Identitas & Logo Usaha (Login, Aplikasi & Struk)</h2>
         </div>
 
         <div class="field">
-          <label>Logo Usaha (Tampil di Header & Struk Thermal)</label>
+          <label>Logo Usaha (Tampil di Layar Login, Header & Struk Thermal)</label>
           <div style="display:flex; align-items:center; gap:12px;">
-            <div class="logo-box" id="previewLogoBox" style="width:58px; height:58px;"></div>
+            <div class="logo-box" id="previewLogoBox" style="width:60px; height:60px;"></div>
             <div style="flex:1;">
               <label class="btn btn-ghost" style="padding:9px; font-size:12.5px; cursor:pointer;">
-                🖼️ Pilih Gambar Logo
+                🖼️ Pilih Gambar Logo Sendiri
                 <input type="file" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)" />
               </label>
-              <button type="button" onclick="resetLogo()" style="background:none; border:none; color:var(--red); font-size:11.5px; font-weight:700; margin-top:5px; cursor:pointer;">Gunakan Logo Keranjang Modern Default</button>
+              <button type="button" onclick="resetLogo()" style="background:none; border:none; color:var(--red); font-size:11.5px; font-weight:700; margin-top:5px; cursor:pointer;">Gunakan Ikon Etalase Toko Default</button>
             </div>
           </div>
         </div>
@@ -1007,9 +1046,15 @@
           <label>Pesan Kaki Struk</label>
           <input type="text" id="cfgFooter" class="input-box" style="width:100%" />
         </div>
-        <div class="field">
-          <label>Modal Awal Kas Usaha (Untuk Neraca)</label>
-          <input type="number" id="cfgCapital" class="input-box" style="width:100%" />
+        <div class="grid-2">
+          <div class="field">
+            <label>Modal Awal Kas Usaha</label>
+            <input type="number" id="cfgCapital" class="input-box" style="width:100%" />
+          </div>
+          <div class="field">
+            <label>PIN Login Kasir (Opsional)</label>
+            <input type="password" id="cfgPin" class="input-box" style="width:100%" inputmode="numeric" maxlength="6" placeholder="Kosongkan = Tanpa PIN" />
+          </div>
         </div>
         <button class="btn btn-red" onclick="saveSettings()">✓ Simpan Profil & Logo Usaha</button>
       </div>
@@ -1035,12 +1080,12 @@
       <div style="font-size:11px; opacity:0.92; font-weight:600;" id="dockQty">0 Item dipilih</div>
       <div style="font-size:16.5px; font-weight:800;" id="dockTotal">Rp 0</div>
     </div>
-    <div style="background:#fff; color:var(--green); padding:8px 14px; border-radius:10px; font-weight:800; font-size:13px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+    <div style="background:#fff; color:var(--green); padding:8px 14px; border-radius:10px; font-weight:800; font-size:13px;">
       Proses Bayar →
     </div>
   </div>
 
-  <!-- Bottom Navigation (7 Menu dengan Kapsul Abu-abu Aktif) -->
+  <!-- Bottom Navigation -->
   <nav class="bottom-bar">
     <button class="tab-btn active" id="nav-dash" onclick="goPage('dash', this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
@@ -1073,7 +1118,7 @@
     </button>
   </nav>
 
-  <!-- MODAL 1: CHECKOUT & DROPDOWN PELANGGAN -->
+  <!-- MODAL 1: CHECKOUT -->
   <div class="overlay" id="cartModal">
     <div class="sheet">
       <div class="panel-head">
@@ -1129,7 +1174,7 @@
     </div>
   </div>
 
-  <!-- MODAL 2: PEMBAYARAN MANUAL / CICILAN KASBON & HUTANG -->
+  <!-- MODAL 2: PEMBAYARAN MANUAL / CICILAN -->
   <div class="overlay" id="partialPayModal">
     <div class="sheet">
       <div class="panel-head">
@@ -1205,35 +1250,16 @@
   </div>
 
   <script>
-    // Logo Keranjang Belanja Modern 3D-Style (SVG Multi-Layer + Kilau + Badge POS)
-    const defaultCartSVG = `
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-        <defs>
-          <linearGradient id="basketBody" x1="6" y1="10" x2="26" y2="23" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="100%" stop-color="#fee2e2"/>
-          </linearGradient>
-          <linearGradient id="badgeGrad" x1="19" y1="3" x2="29" y2="13" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#4ade80"/>
-            <stop offset="100%" stop-color="#16a34a"/>
-          </linearGradient>
-        </defs>
-        <!-- Pegangan & Kerangka -->
-        <path d="M4 7.5H7.2L9.8 19.2C10.1 20.4 11.1 21.2 12.3 21.2H22.4C23.6 21.2 24.6 20.4 24.9 19.2L26.8 11.5H8.5" stroke="#ffffff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Isi Badan Keranjang Transparan -->
-        <path d="M9.2 12.3H25.7L24.1 18.8C23.9 19.5 23.3 20 22.6 20H12.1C11.4 20 10.8 19.5 10.6 18.8L9.2 12.3Z" fill="url(#basketBody)" fill-opacity="0.28"/>
-        <!-- Garis Detail Keranjang -->
-        <line x1="13.5" y1="14.5" x2="14" y2="17.8" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="17.5" y1="14.5" x2="17.5" y2="17.8" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
-        <line x1="21.5" y1="14.5" x2="21" y2="17.8" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
-        <!-- Roda Keranjang -->
-        <circle cx="12.5" cy="25.2" r="2.2" fill="#ffffff"/>
-        <circle cx="12.5" cy="25.2" r="0.9" fill="#b91c1c"/>
-        <circle cx="22.2" cy="25.2" r="2.2" fill="#ffffff"/>
-        <circle cx="22.2" cy="25.2" r="0.9" fill="#b91c1c"/>
-        <!-- Lencana Centang Hijau POS -->
-        <circle cx="24.2" cy="7.8" r="5.2" fill="url(#badgeGrad)" stroke="#991b1b" stroke-width="1.4"/>
-        <path d="M22.1 7.8L23.5 9.2L26.4 6.3" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    // Ikon Nomor 2: Etalase Toko / Kios Kasir Modern
+    const defaultStorefrontSVG = (size = 28) => `
+      <svg width="${size}" height="${size}" viewBox="0 0 32 32" fill="none">
+        <path d="M4.5 12.2L7 5.5H25L27.5 12.2H4.5Z" fill="#ffffff"/>
+        <path d="M10.5 5.5L9.5 12.2M16 5.5V12.2M21.5 5.5L22.5 12.2" stroke="#dc2626" stroke-width="1.6"/>
+        <path d="M4.5 12.2C4.5 13.8 5.8 15 7.4 15C9 15 10.3 13.8 10.3 12.2C10.3 13.8 11.6 15 13.2 15C14.8 15 16 13.8 16 12.2C16 13.8 17.2 15 18.8 15C20.4 15 21.7 13.8 21.7 12.2C21.7 13.8 23 15 24.6 15C26.2 15 27.5 13.8 27.5 12.2H4.5Z" fill="#fecaca"/>
+        <path d="M6.8 15.2V25.5C6.8 26.3 7.5 27 8.3 27H23.7C24.5 27 25.2 26.3 25.2 25.5V15.2" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round"/>
+        <rect x="9.5" y="18.2" width="6.2" height="8.8" rx="1.4" fill="#4ade80"/>
+        <circle cx="14.2" cy="22.8" r="0.8" fill="#14532d"/>
+        <rect x="17.8" y="18.2" width="5" height="4.8" rx="1.2" fill="#ffffff" fill-opacity="0.9"/>
       </svg>`;
 
     let shopCfg = JSON.parse(localStorage.getItem("tk_cfg")) || {
@@ -1241,7 +1267,8 @@
       address: "Jl. Raya Desa No. 45 • WA 0812-3456-7890",
       footer: "Terima kasih telah berbelanja!",
       capital: 5000000,
-      logoData: ""
+      logoData: "",
+      pin: ""
     };
 
     let products = JSON.parse(localStorage.getItem("tk_products")) || [
@@ -1301,10 +1328,43 @@
       return d.toISOString().slice(0, 10);
     }
 
+    // ==================== LOGIN / LOCK SCREEN ====================
+    function setupLoginScreen() {
+      document.getElementById("loginShopName").textContent = shopCfg.name;
+      document.getElementById("loginShopSub").textContent = shopCfg.address || "Sistem Kasir & Pembukuan UMKM";
+      const pinArea = document.getElementById("loginPinArea");
+      const hint = document.getElementById("loginHintText");
+      if (shopCfg.pin && shopCfg.pin.trim() !== "") {
+        pinArea.style.display = "block";
+        hint.textContent = "Masukkan PIN keamanan untuk membuka kasir";
+      } else {
+        pinArea.style.display = "none";
+        hint.textContent = "Ketuk tombol di atas untuk mulai bertransaksi";
+      }
+      document.getElementById("loginPinInput").value = "";
+    }
+
+    function unlockApp() {
+      if (shopCfg.pin && shopCfg.pin.trim() !== "") {
+        const entered = document.getElementById("loginPinInput").value.trim();
+        if (entered !== shopCfg.pin.trim()) {
+          return showPop("PIN Salah", "Kode PIN kasir yang dimasukkan tidak sesuai.", "error");
+        }
+      }
+      document.getElementById("loginScreen").classList.add("hidden");
+    }
+
+    function lockApp() {
+      setupLoginScreen();
+      document.getElementById("loginScreen").classList.remove("hidden");
+    }
+
     function renderLogos() {
-      const html = shopCfg.logoData ? `<img src="${shopCfg.logoData}" alt="Logo" />` : defaultCartSVG;
-      document.getElementById("headerLogoBox").innerHTML = html;
-      document.getElementById("previewLogoBox").innerHTML = html;
+      const headerHtml = shopCfg.logoData ? `<img src="${shopCfg.logoData}" alt="Logo" />` : defaultStorefrontSVG(28);
+      const loginHtml = shopCfg.logoData ? `<img src="${shopCfg.logoData}" alt="Logo" />` : defaultStorefrontSVG(48);
+      document.getElementById("headerLogoBox").innerHTML = headerHtml;
+      document.getElementById("previewLogoBox").innerHTML = headerHtml;
+      document.getElementById("loginLogoBox").innerHTML = loginHtml;
       document.getElementById("receiptLogoPreview").innerHTML = shopCfg.logoData
         ? `<img src="${shopCfg.logoData}" alt="Logo Struk" />`
         : `<div style="display:inline-block; border:1.5px solid #000; padding:3px 10px; font-family:monospace; font-weight:bold; font-size:12px;">[ ${shopCfg.name.toUpperCase()} ]</div>`;
@@ -1317,9 +1377,11 @@
       document.getElementById("cfgAddress").value = shopCfg.address;
       document.getElementById("cfgFooter").value = shopCfg.footer;
       document.getElementById("cfgCapital").value = shopCfg.capital;
+      document.getElementById("cfgPin").value = shopCfg.pin || "";
       document.getElementById("custDueDate").value = getDefaultDueDate(7);
       document.getElementById("supDueDate").value = getDefaultDueDate(14);
 
+      setupLoginScreen();
       syncAllDropdowns();
       renderLogos();
       renderDashboard();
@@ -1383,11 +1445,9 @@
       if (id === "finance") renderFinance();
     }
 
-    function jumpToBills() {
-      goPage("bills", document.getElementById("nav-bills"));
-    }
+    function jumpToBills() { goPage("bills", document.getElementById("nav-bills")); }
 
-    // ==================== 1. DASHBOARD HARIAN / BULANAN / TAHUNAN ====================
+    // ==================== 1. DASHBOARD ====================
     function setDashPeriod(period, btn) {
       dashPeriod = period;
       document.querySelectorAll("#dashPeriodTabs .seg-btn").forEach(b => b.classList.remove("active"));
@@ -1479,7 +1539,7 @@
       }
     }
 
-    // ==================== 2. TAGIHAN KASBON & CICILAN MANUAL ====================
+    // ==================== 2. TAGIHAN & CICILAN ====================
     function getDueStatus(dueDateStr) {
       if (!dueDateStr) return { label: "Tanpa Tempo", cls: "badge-warn", urgent: false };
       const today = new Date();
@@ -1615,9 +1675,7 @@
       document.getElementById("partialPayModal").classList.add("open");
     }
 
-    function fillFullPartial() {
-      document.getElementById("partialAmountInput").value = partialContext.remaining;
-    }
+    function fillFullPartial() { document.getElementById("partialAmountInput").value = partialContext.remaining; }
 
     function submitPartialPayment() {
       const payVal = Number(document.getElementById("partialAmountInput").value || 0);
@@ -1688,11 +1746,7 @@
       `).join("");
     }
 
-    function setCat(c) {
-      activeCat = c;
-      renderChips();
-      renderCatalog();
-    }
+    function setCat(c) { activeCat = c; renderChips(); renderCatalog(); }
 
     function renderCatalog() {
       const kw = document.getElementById("posSearch").value.toLowerCase();
@@ -2001,7 +2055,7 @@
       showPop("Kulakan Tercatat", `Stok ${prod.name} bertambah +${qty} unit dari ${supplier}.`, "success");
     }
 
-    // ==================== 5. KELOLA PRODUK & KATEGORI DROPDOWN ====================
+    // ==================== 5. KELOLA PRODUK ====================
     function saveProduct() {
       const barcode = document.getElementById("prodBarcode").value.trim();
       const name = document.getElementById("prodName").value.trim();
@@ -2111,7 +2165,7 @@
       closeOverlay("scannerModal");
     }
 
-    // ==================== 7. LAPORAN KEUANGAN (LABA RUGI & NERACA) ====================
+    // ==================== 7. LAPORAN KEUANGAN ====================
     function switchReport(type, btn) {
       document.querySelectorAll("#page-finance .seg-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -2271,9 +2325,10 @@
       shopCfg.address = document.getElementById("cfgAddress").value.trim();
       shopCfg.footer = document.getElementById("cfgFooter").value.trim();
       shopCfg.capital = Number(document.getElementById("cfgCapital").value || 0);
+      shopCfg.pin = document.getElementById("cfgPin").value.trim();
       persist();
       initApp();
-      showPop("Profil Usaha Tersimpan", `Identitas & logo "${shopCfg.name}" berhasil diperbarui.`, "success");
+      showPop("Profil Usaha Tersimpan", `Identitas, logo & keamanan "${shopCfg.name}" berhasil diperbarui.`, "success");
     }
 
     function sendWA() {
