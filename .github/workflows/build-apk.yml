@@ -40,11 +40,11 @@ jobs:
               exit 1
             fi
           fi
-          rm -rf android
+          rm -rf android package.json package-lock.json capacitor.config.json capacitor.config.ts
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor/assets
 
-      - name: Generate Otomatis Ikon Etalase Toko (Tanpa Upload Manual)
+      - name: Generate Otomatis Ikon Etalase Toko
         run: |
           node -e '
           const fs = require("fs");
@@ -82,9 +82,11 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+          find app/build/outputs/apk -name "*.apk"
 
       - name: Upload File APK
         uses: actions/upload-artifact@v4
         with:
           name: Aplikasi-Kasir-UMKM
-          path: android/app/build/outputs/apk/debug/app-debug.apk,
+          path: android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
